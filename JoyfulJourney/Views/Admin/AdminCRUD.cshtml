@@ -1,0 +1,110 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Your Destination Data</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #eaeaea;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            padding: 50px;
+            width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            display: block;
+            padding: 15px 0;
+            font-size: 18px;
+            color: white;
+            background-color: #3498db;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-transform: uppercase;
+        }
+
+            .btn:hover {
+                background-color: #2980b9;
+                transform: translateY(-5px);
+            }
+
+        .btn-create {
+            background-color: #2ecc71;
+        }
+
+            .btn-create:hover {
+                background-color: #27ae60;
+            }
+
+        .btn-edit {
+            background-color: #f1c40f;
+        }
+
+            .btn-edit:hover {
+                background-color: #f39c12;
+            }
+
+        .btn-update {
+            background-color: #3498db;
+        }
+
+            .btn-update:hover {
+                background-color: #2980b9;
+            }
+
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+
+            .btn-delete:hover {
+                background-color: #c0392b;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Your Data</h1>
+
+        <!-- Button group with grid layout -->
+        <div class="button-group">
+            <button class="btn btn-create">Create</button>
+            <button class="btn btn-edit">Edit</button>
+            <button class="btn btn-update">Update</button>
+            <button class="btn btn-delete">Delete</button>
+        </div>
+    </div>
+</body>
+</html>
+
+
+

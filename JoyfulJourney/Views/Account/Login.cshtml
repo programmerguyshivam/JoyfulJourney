@@ -1,0 +1,193 @@
+﻿@model Journey.DTOs.LoginDTO
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* Login Container Styles */
+        .login-container {
+            max-width: 320px;
+            width: 100%;
+            padding: 15px;
+            background-color: #ffffff;
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .login-container:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            }
+
+        /* Login Title Styles */
+        .login-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 24px;
+            color: #007bff;
+        }
+
+        /* Form Group Styles */
+        .form-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        /* Label Styles */
+        .label-style {
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: block;
+            color: #555;
+        }
+
+        /* Input Styles */
+        .input-style {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            height: 32px;
+            font-size: 12px;
+            color: #333;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .input-style:focus {
+                border-color: #007bff;
+                box-shadow: 0 0 6px rgba(0, 123, 255, 0.3);
+                outline: none;
+            }
+
+        /* Submit Button Styles */
+        .submit-button {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            height: 32px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+            .submit-button:hover {
+                background-color: #0056b3;
+                transform: scale(1.03);
+            }
+
+        /* Back Link Styles */
+        .back-link {
+            text-align: center;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12px;
+            transition: color 0.3s ease;
+        }
+
+            .back-link:hover {
+                color: #0056b3;
+                text-decoration: underline;
+            }
+
+        /* Validation Error Styles */
+        .text-danger {
+            color: #dc3545;
+        }
+
+        /* Horizontal Rule Styles */
+        hr {
+            width: 100%;
+            border: 0;
+            border-top: 1px solid #e1e5eb;
+            margin: 15px 0;
+        }
+
+        /* Checkbox Styles */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+            .checkbox-container input[type="checkbox"] {
+                width: 14px;
+                height: 14px;
+                margin-right: 6px;
+                accent-color: #007bff; /* Modern browsers support accent-color for checkboxes */
+            }
+
+            .checkbox-container label {
+                margin: 0;
+                color: #555;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h4 class="login-title">Login</h4>
+        <hr />
+        <form asp-action="Login">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="username" class="label-style"></label>
+                <input asp-for="username" class="input-style" />
+                <span asp-validation-for="username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="label-style"></label>
+                <input asp-for="Password" class="input-style" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            @* <div class="form-group checkbox-container">
+                <input type="checkbox" id="rememberMe" name="RememberMe" />
+                <label for="rememberMe">Remember Me</label>
+            </div> *@          
+            <div class="form-group">
+                <input type="submit" value="Login" class="submit-button" />
+            </div>
+            <div>
+                <a asp-action="Register" asp-controller="Account" class="back-link">Don't Have an Account? Register</a>
+            </div>
+        </form>
+    </div>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

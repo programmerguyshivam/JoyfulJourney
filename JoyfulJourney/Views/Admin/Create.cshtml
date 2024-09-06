@@ -1,0 +1,73 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = null;
+}
+
+
+<h1>@ViewData["Title"]</h1>
+
+<style>
+    /* General styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    h1 {
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    .container {
+        margin-top: 20px;
+    }
+
+    /* Button styles */
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+    /* Form styles */
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 0.25rem;
+        box-shadow: none;
+    }
+
+    textarea.form-control {
+        height: 150px;
+        resize: vertical;
+    }
+
+    .row.mb-3 {
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="@Url.Action("AddDestination", "Admin", new { type = "Destination" })">
+                Add Destination
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a class="btn btn-primary" href="@Url.Action(" AddPackage", "Admin", new { type = "Package" })">
+                Add Package
+            </a>
+        </div>
+    </div>
+</div>
+
