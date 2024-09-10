@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor acess
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <head>
@@ -81,7 +83,18 @@
                         <a href="@Url.Action("Services","Home")" class="nav-item nav-link">Services</a>
                         <a href="@Url.Action("Packages","Home")" class="nav-item nav-link">Packages</a>
                         <a href="@Url.Action("Destinations","Home")" class="nav-item nav-link">Destinations</a>
+                        @if (acess.HttpContext.Session.GetString("GetSessionUserName") != null)
+                        {
+                            var data = acess.HttpContext.Session.GetString("UserSession");
 
+                            ViewBag.username = data;
+                            var username = ViewBag.username as string;
+                            var maxLength = 5; // Set your desired maximum length here
+                            var displayUsername = username?.Length > maxLength ? username.Substring(0, maxLength) + "..." : username;
+                            <i class="fas fa-user-circle nav-item nav-link"></i>
+                            <h5 style="color:white"> @displayUsername </h5>
+
+                        }
                         <a href="@Url.Action("Blog","Home")" class="nav-item nav-link">Blog</a>
 
                       @*   <div class="nav-item dropdown">

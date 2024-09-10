@@ -48,6 +48,7 @@ namespace JoyfulJourney.Controllers
             }
             else if (result.IsValid)
             {
+                HttpContext.Session.SetString("GetSessionUserName", username);
                 return RedirectToAction("Index", "Home");
             }
             // Invalid Credentials

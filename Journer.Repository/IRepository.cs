@@ -28,6 +28,13 @@ namespace Journer.Repository
         public void AddPackageAdmin(AddPackageAdmin addPackageAdmin);
 
         public List<GetAdminPackage> getAdminPackages();
+
+        public void UpdatePackage(UpdateAdminPackage updateAdminPackage);
+
+        public void DeletePackageAdmin(int packageId);
+
+
+
         public void SendEMAIL(string address, string subject, string body);
     }
 }

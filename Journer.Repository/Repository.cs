@@ -27,7 +27,7 @@ namespace Journer.Repository
             return _configuration.GetConnectionString("MyConnectionCS");
         }
 
-        // ADD CUSTOMER PAGE FOR REGISTER//
+                             #region -- Register Email -----
         public void AddCustomer(RegisterDTO registerDTO)
         {
             using (SqlConnection con = new SqlConnection(this.GetSqlConnection()))
@@ -48,8 +48,10 @@ namespace Journer.Repository
 
                 }
             }
+            #endregion ---------------Register Customer----------------------
         }
 
+        #region -------------------Login Validation for admin-------------------------
         public (bool IsValid, bool IsAdmin) LoginValidate(string UserName, string password)
         {
             bool isValid = false;
@@ -115,11 +117,12 @@ namespace Journer.Repository
             }
 
             return (isValid, isAdmin);
+            #endregion -------- Login Validation For Admin
         }
 
 
         // CRUD FOR ADMIN PROJECTS ///////////////////////////////////////////////////
-        // FOR ADD DESTINATION PAGE FOR ADMIN////////////////////////////////////////////////////
+        #region Add Destination For Admin
         public void AddDest(AddAdminDestinationDTO destinationDTO)
         {
 
@@ -142,9 +145,10 @@ namespace Journer.Repository
                 }
 
             }
-
+            #endregion
         }
-                 // GET DATA FOR ADMIN DESTINATION////////////////////////
+
+        #region Get Destination For Admin
         public List<GetAdminDestinationDTO> getAdminDestination()
         {
             using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
@@ -182,13 +186,12 @@ namespace Journer.Repository
                 }
 
             }
+            #endregion
         }
 
-         // GET DATA FOR ADMIN DESTINATION////////////////////////
 
 
-
-        // UPDATE DESTINATION FOR ADMIN TABLE/////////////////////////////////////////////////////////
+        #region Update Destination For Admin
         public void UpdateDest(UpdateAdminDestinationDTO updateAdminDestinationDTO)
         {
             using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
@@ -213,12 +216,10 @@ namespace Journer.Repository
 
 
             }
-
+            #endregion
         }
-        // UPDATE DESTINATION FOR ADMIN TABLE/////////////////////////////////////////////////////////
 
-
-        // DELETE DESTINATION FOR ADMIN ////////////////////////////////////////////////////////
+        #region Delete Destination For Admin
         public void DeleteDest(int id )
         {
             using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
@@ -233,12 +234,12 @@ namespace Journer.Repository
                     cmd.ExecuteNonQuery();
                 }
             }
+            #endregion
         }
-        // DELETE DESTINATION FOR ADMIN ////////////////////////////////////////////////////////
 
 
         ///////////////////////////////////////////////  FOR BOOKING CUSTOMER///////////////////////////////
-
+        #region For Customer Book Destination
         public void AddBook(AddBookUserDTO addBookUserDTO)
         {
 
@@ -267,8 +268,11 @@ namespace Journer.Repository
 
                 
             }
+            #endregion
         }
 
+        // // //Packages for Admin
+        #region Add Packages for Admin
         public void AddPackageAdmin(AddPackageAdmin addPackageAdmin)
         {
 
@@ -294,25 +298,25 @@ namespace Journer.Repository
                 }
 
             }
-
+            #endregion
         }
+
 
         public List<GetAdminPackage> getAdminPackages()
         {
-            using (SqlConnection conn = new SqlConnection(this.GetSqlConnection())) 
-            
-            { 
-            
-                using ( SqlCommand cmd = new SqlCommand ("GETDATAPACKAGES", conn)) 
-                
+            List<GetAdminPackage> getAdminPackages = new List<GetAdminPackage>();
+
+            using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
+            {
+                using (SqlCommand cmd = new SqlCommand("GETDATAPACKAGES", conn))
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
-                    da.Fill(dt);
+                    conn.Open();  // Open connection
+                    da.Fill(dt);  // Fill the DataTable
 
-                    List<GetAdminPackage> getAdminPackages = new List<GetAdminPackage>();
                     foreach (DataRow row in dt.Rows)
                     {
                         getAdminPackages.Add(new GetAdminPackage()
@@ -322,18 +326,15 @@ namespace Journer.Repository
                             Description = Convert.ToString(row["Description"]),
                             Price = Convert.ToDecimal(row["Price"]),
                             Duration = Convert.ToString(row["Duration"]),
-                            Destination_id = Convert.ToInt32(row["Destination_id"]),
                             ImageURL = Convert.ToString(row["ImageURL"])
                         });
-
-
                     }
                 }
-            
             }
-            return getAdminPackages();
 
+            return getAdminPackages;  // Return the list of packages
         }
+
 
         #region -- Email Sending -----
         public void SendEMAIL(string address, string subject, string body)
@@ -360,9 +361,49 @@ namespace Journer.Repository
                 }
 
             }
-
+            #endregion
         }
-        #endregion
+
+        public void UpdatePackage(UpdateAdminPackage updateAdminPackage)
+        {
+          using (SqlConnection conn = new SqlConnection(this.GetSqlConnection())) 
+            
+            {
+            using(SqlCommand cmd = new SqlCommand ("UPDATEDATAPACKAGES", conn)) 
+                
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@PackageId", updateAdminPackage.PackageId);
+                    cmd.Parameters.AddWithValue("@Title", updateAdminPackage.Title);
+                    cmd.Parameters.AddWithValue("@Description", updateAdminPackage.Description);
+                    cmd.Parameters.AddWithValue("@Price", updateAdminPackage.Price);
+                    cmd.Parameters.AddWithValue("@Duration", updateAdminPackage.Duration);
+                    cmd.Parameters.AddWithValue("@ImageURL", updateAdminPackage.ImageURL);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+        }
+
+        public void DeletePackageAdmin(int packageId)
+        {
+            using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
+            {
+                using (SqlCommand cmd = new SqlCommand("DELETEDATAPACKAGE", conn))
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@PackageId", packageId);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
     }
 
 }

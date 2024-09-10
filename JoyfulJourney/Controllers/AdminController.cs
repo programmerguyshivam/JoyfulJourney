@@ -19,10 +19,16 @@ namespace JoyfulJourney.Controllers
             var obj = repository.getAdminDestination();
             return View(obj);
         }
+        [HttpGet]
 
-        public ActionResult GetPackagess()
+        public ActionResult GetPackages()
         {
             var obj = repository.getAdminPackages();
+            if (obj == null || !obj.Any())
+            {
+                // Add some logging here to see if the list is empty
+                throw new Exception("No data returned from the database");
+            }
             return View(obj);
         }
         public ActionResult Create()
@@ -151,6 +157,13 @@ namespace JoyfulJourney.Controllers
         public ActionResult Delete(int id)
         {
             repository.DeleteDest(id);
+            return RedirectToAction("GetData", "Admin");
+        }
+
+        [HttpGet]
+        public ActionResult DeletePack(int id)
+        {
+            repository.DeletePackageAdmin(id);
             return RedirectToAction("GetData", "Admin");
         }
 

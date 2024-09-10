@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Journey.DTOs
 {
-    internal class DeleteAdminPackage
+    public  class DeleteAdminPackage
     {
+        public int PackageId { get; set; }
     }
 }
