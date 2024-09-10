@@ -26,7 +26,7 @@ namespace JoyfulJourney.Controllers
         // POST: BookCustomer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Custome(IFormCollection collection)
         {
             try
             {

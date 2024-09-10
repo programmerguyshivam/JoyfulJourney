@@ -21,9 +21,13 @@ namespace Journer.Repository
         public void DeleteDest(int id);
 
 
-        public (bool IsValid, bool IsAdmin) ValidateUser(string UserName, string Password);
+        public (bool IsValid, bool IsAdmin) LoginValidate(string UserName, string Password);
 
         public void AddBook(AddBookUserDTO addBookUserDTO);
 
+        public void AddPackageAdmin(AddPackageAdmin addPackageAdmin);
+
+        public List<GetAdminPackage> getAdminPackages();
+        public void SendEMAIL(string address, string subject, string body);
     }
 }

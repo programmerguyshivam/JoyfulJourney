@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,76 +50,71 @@ namespace Journer.Repository
             }
         }
 
-        public (bool IsValid, bool IsAdmin) ValidateUser(string userName, string password)
+        public (bool IsValid, bool IsAdmin) LoginValidate(string UserName, string password)
         {
-            // Define the return value
             bool isValid = false;
             bool isAdmin = false;
 
-            using (SqlConnection connection = new SqlConnection(this.GetSqlConnection()))
+            using (SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("MyConnectionCS")))
             {
                 connection.Open();
 
-                // First, check in the Admin table
-                using (SqlCommand cmd = new SqlCommand("AdminValidateSP", connection))
+                try
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@UserName", (object)userName ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Password", (object)password ?? DBNull.Value);
-
-
-
-                    SqlParameter outputParam = new SqlParameter
+                    // First, check in the Admin table
+                    using (SqlCommand cmd = new SqlCommand("AdminValidateSP", connection))
                     {
-                        ParameterName = "@isValid",
-                        SqlDbType = SqlDbType.Bit,
-                        Direction = ParameterDirection.Output
-                    };
-                    cmd.Parameters.Add(outputParam);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@UserName", UserName ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Password", password ?? (object)DBNull.Value);
 
-                    cmd.ExecuteNonQuery();
+                        SqlParameter outputParam = new SqlParameter
+                        {
+                            ParameterName = "@IsAdmin",
+                            SqlDbType = SqlDbType.Bit,
+                            Direction = ParameterDirection.Output
+                        };
+                        cmd.Parameters.Add(outputParam);
 
-                    isAdmin = (bool)outputParam.Value;
-                    if (isAdmin)
+                        cmd.ExecuteNonQuery();
+
+                        isAdmin = (bool)outputParam.Value;
+                        if (isAdmin)
+                        {
+                            // If admin credentials are valid, return immediately
+                            return (true, true);
+                        }
+                    }
+
+                    // If not an admin, check in the User table
+                    using (SqlCommand cmd = new SqlCommand("LoginValidate", connection))
                     {
-                        // If admin credentials are valid, return immediately
-                        return (true, true);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@UserName", UserName ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@Password", password ?? (object)DBNull.Value);
+
+                        SqlParameter outputParam = new SqlParameter
+                        {
+                            ParameterName = "@IsValid",
+                            SqlDbType = SqlDbType.Bit,
+                            Direction = ParameterDirection.Output
+                        };
+                        cmd.Parameters.Add(outputParam);
+
+                        cmd.ExecuteNonQuery();
+
+                        isValid = (bool)outputParam.Value;
                     }
                 }
-            }
-            // Establish a connection to the database
-            using (SqlConnection con = new SqlConnection(this.GetSqlConnection()))
-            {
-                // Create a command to execute the stored procedure
-                using (SqlCommand cmd = new SqlCommand("UserLoginValidate", con))
+                catch (Exception ex)
                 {
-                    // Specify that we are executing a stored procedure
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-                    // Add parameters with proper prefixes
-                    cmd.Parameters.AddWithValue("@UserName", userName);
-                    cmd.Parameters.AddWithValue("@Password", password);
-
-                    // Add output parameter
-                    SqlParameter outputParam = new SqlParameter("@IsValid", System.Data.SqlDbType.Bit)
-                    {
-                        Direction = System.Data.ParameterDirection.Output
-                    };
-                    cmd.Parameters.Add(outputParam);
-
-                    // Open the connection
-                    con.Open();
-
-                    // Execute the command and get the result
-                    cmd.ExecuteScalar();
-
-                    // Retrieve the output parameter value
-                    isValid = (bool)outputParam.Value;
+                    // Handle exception (e.g., log it)
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                    // Optionally, you can rethrow or handle the exception as needed
                 }
             }
 
-            // Return the validation result
-            return (isValid, false);
+            return (isValid, isAdmin);
         }
 
 
@@ -135,6 +133,7 @@ namespace Journer.Repository
                     cmd.Parameters.AddWithValue("@Name", destinationDTO.Name);
                     cmd.Parameters.AddWithValue("@Description", destinationDTO.Description);
                     cmd.Parameters.AddWithValue("@Country", destinationDTO.Country);
+                    cmd.Parameters.AddWithValue("@ImageURL", destinationDTO.ImageURl);
 
                     conn.Open();
                     cmd.ExecuteNonQuery();
@@ -173,6 +172,8 @@ namespace Journer.Repository
 
                             Country = Convert.ToString((string)dr["Country"]),
 
+                            ImageURL = Convert.ToString(dr["ImageURL"])
+
                         });
                     }
                     conn.Close();
@@ -182,6 +183,11 @@ namespace Journer.Repository
 
             }
         }
+
+         // GET DATA FOR ADMIN DESTINATION////////////////////////
+
+
+
         // UPDATE DESTINATION FOR ADMIN TABLE/////////////////////////////////////////////////////////
         public void UpdateDest(UpdateAdminDestinationDTO updateAdminDestinationDTO)
         {
@@ -209,7 +215,10 @@ namespace Journer.Repository
             }
 
         }
-         // DELETE DESTINATION FOR ADMIN ////////////////////////////////////////////////////////
+        // UPDATE DESTINATION FOR ADMIN TABLE/////////////////////////////////////////////////////////
+
+
+        // DELETE DESTINATION FOR ADMIN ////////////////////////////////////////////////////////
         public void DeleteDest(int id )
         {
             using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
@@ -225,6 +234,10 @@ namespace Journer.Repository
                 }
             }
         }
+        // DELETE DESTINATION FOR ADMIN ////////////////////////////////////////////////////////
+
+
+        ///////////////////////////////////////////////  FOR BOOKING CUSTOMER///////////////////////////////
 
         public void AddBook(AddBookUserDTO addBookUserDTO)
         {
@@ -242,8 +255,7 @@ namespace Journer.Repository
                     cmd.Parameters.AddWithValue("@Email", addBookUserDTO.Email);
                     cmd.Parameters.AddWithValue("@DateAndTime", addBookUserDTO.DateAndTime);
                     cmd.Parameters.AddWithValue("@Destination", addBookUserDTO.Destinations);
-                    cmd.Parameters.AddWithValue("@Persons", addBookUserDTO.Persons);
-                    cmd.Parameters.AddWithValue("@Category", addBookUserDTO.Categories);
+                   
                     cmd.Parameters.AddWithValue("@SpecialRequest", addBookUserDTO.SpecialRequest);
 
                     conn.Open();
@@ -257,12 +269,102 @@ namespace Journer.Repository
             }
         }
 
-        /////////////////////////////////////////////// CRUD FOR BOOKING CUSTOMER///////////////////////////////
+        public void AddPackageAdmin(AddPackageAdmin addPackageAdmin)
+        {
+
+            using (SqlConnection conn = new SqlConnection(this.GetSqlConnection()))
+            
+            {
+                using (SqlCommand cmd = new SqlCommand("CREATEDATAPACKAGES", conn)) 
+                
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@Title", addPackageAdmin.Title);
+                    cmd.Parameters.AddWithValue("@Description", addPackageAdmin.Description);
+                    cmd.Parameters.AddWithValue("@Price", addPackageAdmin.Price);
+                    cmd.Parameters.AddWithValue("@Duration", addPackageAdmin.Duration);
+                    cmd.Parameters.AddWithValue("@Destination_id",addPackageAdmin.Destination_id);
+                    cmd.Parameters.AddWithValue("@ImageURL", addPackageAdmin.ImageURL);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
 
 
+                }
 
+            }
+
+        }
+
+        public List<GetAdminPackage> getAdminPackages()
+        {
+            using (SqlConnection conn = new SqlConnection(this.GetSqlConnection())) 
+            
+            { 
+            
+                using ( SqlCommand cmd = new SqlCommand ("GETDATAPACKAGES", conn)) 
+                
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    List<GetAdminPackage> getAdminPackages = new List<GetAdminPackage>();
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        getAdminPackages.Add(new GetAdminPackage()
+                        {
+                            PackageId = Convert.ToInt32(row["PackageId"]),
+                            Title = Convert.ToString(row["Title"]),
+                            Description = Convert.ToString(row["Description"]),
+                            Price = Convert.ToDecimal(row["Price"]),
+                            Duration = Convert.ToString(row["Duration"]),
+                            Destination_id = Convert.ToInt32(row["Destination_id"]),
+                            ImageURL = Convert.ToString(row["ImageURL"])
+                        });
+
+
+                    }
+                }
+            
+            }
+            return getAdminPackages();
+
+        }
+
+        #region -- Email Sending -----
+        public void SendEMAIL(string address, string subject, string body)
+        {
+            using (MailMessage mm = new MailMessage())
+            {
+                mm.From = new MailAddress("corporatehuntofficial@gmail.com");
+                mm.To.Add(address);
+                mm.Subject = subject;
+                mm.Body = body;
+                mm.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient())
+                {
+                    smtp.Host = "smtp.gmail.com";
+                    smtp.EnableSsl = true;
+
+                    NetworkCredential nc = new NetworkCredential("corporatehuntofficial@gmail.com", "tsjs nnlw kpim noqo");
+                    smtp.UseDefaultCredentials = false;
+                    smtp.Credentials = nc;
+                    smtp.Port = 587;
+
+                    smtp.Send(mm);
+                }
+
+            }
+
+        }
+        #endregion
     }
+
 }
 
 
-        

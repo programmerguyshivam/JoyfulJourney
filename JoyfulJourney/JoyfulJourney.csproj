@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Journer.Repository\Journer.Repository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Destination\" />
+  </ItemGroup>
+
 </Project>

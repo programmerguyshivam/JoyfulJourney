@@ -20,6 +20,11 @@ namespace JoyfulJourney.Controllers
             return View(obj);
         }
 
+        public ActionResult GetPackagess()
+        {
+            var obj = repository.getAdminPackages();
+            return View(obj);
+        }
         public ActionResult Create()
         {
             return View();
@@ -67,15 +72,42 @@ namespace JoyfulJourney.Controllers
             return View();
         }
 
-        public ActionResult AddDestination(AddAdminDestinationDTO destinationDTO)
+        [HttpPost]
+        public async Task<IActionResult> AddDestination(AddAdminDestinationDTO addAdminDestinationDTO )
         {
-            repository.AddDest(destinationDTO);
-            return RedirectToAction("GetData","Admin");
-        }
+            if (addAdminDestinationDTO.IMAGE != null && addAdminDestinationDTO.IMAGE.Length > 0)
+            {
+                // Determine the file path and ensure it exists
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Destination");
+                Directory.CreateDirectory(uploadsFolder);
 
-        public ActionResult AddPackage()
+                var fileName = Path.GetFileName(addAdminDestinationDTO.IMAGE.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                // Save the file synchronously
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    addAdminDestinationDTO.IMAGE.CopyTo(stream); // Synchronously copy the file
+                }
+
+                addAdminDestinationDTO.ImageURl = $"/Destination/{fileName}"; // Set image path in DTO
+            }
+
+            // Add the breakfast dish
+            repository.AddDest(addAdminDestinationDTO);
+
+            return RedirectToAction("GetData", "Admin");
+        }
+        [HttpGet]
+        public ActionResult AddPackages()
         {
+
             return View();
+        }
+        public ActionResult AddPackages(AddPackageAdmin addPackageAdmin)
+        {
+            repository.AddPackageAdmin(addPackageAdmin);
+            return RedirectToAction("GetPackage", "Admin");
         }
 
         // POST: AdminController/Create

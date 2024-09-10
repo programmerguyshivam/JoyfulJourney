@@ -15,6 +15,7 @@ namespace Journey.DTOs
 
         public string Country { get; set; }
 
+        public string ImageURL { get; set; }
 
     }
 }

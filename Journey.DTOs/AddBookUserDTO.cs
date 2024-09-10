@@ -14,8 +14,7 @@ namespace Journey.DTOs
         public string Email { get; set; }
         public DateTime DateAndTime { get; set; } 
         public string Destinations { get; set; }
-        public string Persons { get; set; } 
-        public string Categories { get; set; }
+      
         public string SpecialRequest { get; set; }
     }
 }

@@ -1,3 +1,5 @@
+using Journer.Repository;
+using Journey.DTOs;
 using JoyfulJourney.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -6,11 +8,11 @@ namespace JoyfulJourney.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IRepository repository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IRepository repository)
         {
-            _logger = logger;
+            this.repository = repository;
         }
 
         public IActionResult Index()
@@ -41,7 +43,8 @@ namespace JoyfulJourney.Controllers
 
         public IActionResult Destinations()
         {
-            return View();
+            var data = repository.getAdminDestination();
+            return View(data);
         }
         public IActionResult Blog()
         {
@@ -58,6 +61,12 @@ namespace JoyfulJourney.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+        [HttpPost]
+        public IActionResult CutomerBooking(AddBookUserDTO addBookUserDTO)
+        {
+            repository.AddBook(addBookUserDTO);
+            return RedirectToAction("Index","Home");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

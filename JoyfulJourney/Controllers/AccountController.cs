@@ -1,6 +1,7 @@
 ﻿using Journer.Repository;
 using Journey.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Core.Types;
 
 namespace JoyfulJourney.Controllers
 {
@@ -20,6 +21,14 @@ namespace JoyfulJourney.Controllers
         [HttpPost]
         public IActionResult Register(RegisterDTO registerDTO)
         {
+            string subject = "New Car Added";
+            string body = $"Dear{registerDTO.Email},<br>" +
+                       "Your Car Was Successfully Added.<br> " +
+                       "$Car: { insert.CarName}<br>" +
+            "$Price : {insert.Carprice}<br>" +
+            "Thank You !!";
+
+            _repository.SendEMAIL(registerDTO.Email, subject, body);
             _repository.AddCustomer(registerDTO);
             return RedirectToAction("Login","Account");
         }
@@ -31,11 +40,11 @@ namespace JoyfulJourney.Controllers
         [HttpPost]
         public IActionResult Login(string username, string password)
         {
-            var result = _repository.ValidateUser(username, password);
+            var result = _repository.LoginValidate(username, password);
 
             if (result.IsAdmin)
             {
-                return RedirectToAction("AdminIndex", "Admin");
+                return RedirectToAction("AdminCrud", "Admin");
             }
             else if (result.IsValid)
             {
